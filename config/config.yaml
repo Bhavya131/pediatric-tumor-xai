@@ -1,0 +1,13 @@
+# Real-data configuration. Edit paths and column names for your dataset.
+expression: data/raw/expression.csv   # genes x samples, first column = gene id
+metadata: data/raw/metadata.csv       # one row per sample
+sample_col: sample_id
+label_col: subgroup                   # class to predict (e.g. tumour subgroup)
+time_col: os_time                     # optional: survival time (set "" to skip survival)
+event_col: os_event                   # optional: 1 = event, 0 = censored
+n_top_genes: 2000                     # unsupervised variance filter (no labels used)
+outdir: results
+seed: 42
+outer_folds: 5
+outer_repeats: 3
+inner_folds: 3

@@ -1,0 +1,15 @@
+name: pediatric-tumor-xai
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - python=3.12
+  - numpy
+  - pandas
+  - scikit-learn
+  - matplotlib
+  - lifelines
+  - shap
+  - snakemake
+  - pytest
+  - pyyaml

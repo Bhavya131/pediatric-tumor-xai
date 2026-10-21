@@ -1,0 +1,13 @@
+# Small synthetic dataset used by the tests and CI.
+expression: data/test/expression.csv
+metadata: data/test/metadata.csv
+sample_col: sample_id
+label_col: subgroup
+time_col: os_time
+event_col: os_event
+n_top_genes: 200
+outdir: results/test
+seed: 42
+outer_folds: 3
+outer_repeats: 1
+inner_folds: 3

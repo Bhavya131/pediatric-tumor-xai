@@ -1,0 +1,8 @@
+__pycache__/
+.snakemake/
+.pytest_cache/
+data/raw/*
+!data/raw/.gitkeep
+results/
+*.pyc
+"data/test/*.csv" 

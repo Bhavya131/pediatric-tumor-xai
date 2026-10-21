@@ -1,0 +1,68 @@
+# Explainable ML workflow for tumour expression data.
+# Real data : snakemake --cores 4
+# Test data : python scripts/make_test_data.py && snakemake --cores 2 --configfile config/test.yaml
+import yaml
+
+configfile: "config/config.yaml"
+
+OUT = config["outdir"]
+CFG = f"{OUT}/resolved_config.yaml"
+
+
+rule all:
+    input:
+        f"{OUT}/report.html"
+
+
+rule resolved_config:
+    output: CFG
+    run:
+        import os
+        os.makedirs(OUT, exist_ok=True)
+        with open(output[0], "w") as fh:
+            yaml.safe_dump(dict(config), fh)
+
+
+rule prepare:
+    input: cfg=CFG, expr=config["expression"], meta=config["metadata"]
+    output:
+        f"{OUT}/prepared/X.csv",
+        f"{OUT}/prepared/y.csv",
+        f"{OUT}/prepared/qc_summary.json",
+        f"{OUT}/prepared/pca.png"
+    shell: "python scripts/01_prepare_data.py --config {input.cfg}"
+
+
+rule train:
+    input: cfg=CFG, X=f"{OUT}/prepared/X.csv", y=f"{OUT}/prepared/y.csv"
+    output:
+        f"{OUT}/models/cv_results.csv",
+        f"{OUT}/models/cv_summary.csv",
+        f"{OUT}/models/best_model.txt",
+        f"{OUT}/models/cv_boxplot.png"
+    shell: "python scripts/02_train_models.py --config {input.cfg}"
+
+
+rule explain:
+    input: cfg=CFG, best=f"{OUT}/models/best_model.txt"
+    output:
+        f"{OUT}/explain/feature_importance.csv",
+        f"{OUT}/explain/explain_summary.txt",
+        f"{OUT}/explain/confusion_matrix.png"
+    shell: "python scripts/03_explain.py --config {input.cfg}"
+
+
+rule survival:
+    input: cfg=CFG, X=f"{OUT}/prepared/X.csv"
+    output: f"{OUT}/survival/survival_summary.json"
+    shell: "python scripts/04_survival.py --config {input.cfg}"
+
+
+rule report:
+    input:
+        cfg=CFG,
+        a=f"{OUT}/explain/feature_importance.csv",
+        b=f"{OUT}/survival/survival_summary.json",
+        c=f"{OUT}/models/cv_summary.csv"
+    output: f"{OUT}/report.html"
+    shell: "python scripts/05_report.py --config {input.cfg}"
